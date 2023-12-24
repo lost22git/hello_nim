@@ -20,7 +20,7 @@ proc doSleep() =
   echo fmt"{getThreadId() = }"
   sleep 3000
 
-for i in 0 ..< threads.high:
+for i in 0..<threads.high:
   createThread(threads[i], doSleep)
 
 threads.joinThreads

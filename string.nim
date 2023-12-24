@@ -53,13 +53,13 @@ echo fmt"`{sb}` rune长度: {sb.runeLen}"
 
 var
   substrOrigin = "你好"
-  substr = substrOrigin[0 ..^ 1] # 复制指定范围的字符到新字符串
+  substr = substrOrigin[0..^1] # 复制指定范围的字符到新字符串
 
 echo fmt"{substrOrigin = }"
 echo fmt"{substr = }"
 assert substrOrigin == substr
 
-substrOrigin[0 ..^ 1] = "世界" # 修改原来的字符串
+substrOrigin[0..^1] = "世界" # 修改原来的字符串
 
 echo fmt"{substrOrigin = }"
 echo fmt"{substr = }"
@@ -69,8 +69,9 @@ assert substrOrigin != substr
 
 import std/[nre]
 
-var csv =
-  """
+var
+  csv =
+    """
 nim,gc,native code
 rust,no gc,native code
 java,gc,bytecode
@@ -87,7 +88,7 @@ when not defined(windows):
     let
       captures = m.captures
       captureBounds = m.captureBounds
-    for i in 0 ..< captureCount:
+    for i in 0..<captureCount:
       let
         cap = captures[i]
         capBound = captureBounds[i]

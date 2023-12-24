@@ -9,9 +9,10 @@ import std/[strformat]
 proc `===`(title: string) =
   echo fmt"--{title:-<30}"
 
-type Fighter = object
-  name: string = "Ken"
-  skill: seq[string]
+type
+  Fighter = object
+    name: string = "Ken"
+    skill: seq[string]
 
 proc testImmut(v: Fighter) =
   # v.skill.add "hadouken" # 不允许修改

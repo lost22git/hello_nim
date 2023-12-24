@@ -14,7 +14,7 @@ proc doSleep(i: Natural) =
 let st = getMonoTime()
 
 parallel:
-  for i in 0 ..< 10:
+  for i in 0..<10:
     spawn doSleep(i)
 
 let ed = getMonoTime()
