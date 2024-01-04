@@ -9,10 +9,9 @@ import std/[strformat]
 proc `===`(title: string) =
   echo fmt"--{title:-<30}"
 
-type
-  Fighter = object
-    name: string = "Ken"
-    skill: seq[string]
+type Fighter = object
+  name: string = "Ken"
+  skill: seq[string]
 
 proc testImmut(v: Fighter) =
   # v.skill.add "hadouken" # 不允许修改
@@ -38,28 +37,28 @@ proc testPtr(v: ptr Fighter) =
 
 let toImmut = Fighter()
 echo fmt"{toImmut.repr =}"
-toImmut.testImmut
+toImmut.testImmut()
 echo fmt"{toImmut.repr =}"
 
 ==="testMut"
 
 var toMut = Fighter()
 echo fmt"{toMut.repr =}"
-toMut.testMut
+toMut.testMut()
 echo fmt"{toMut.repr =}"
 
 ==="testCopy"
 
 let toCopy = Fighter()
 echo fmt"{toCopy.repr =}"
-toCopy.testCopy
+toCopy.testCopy()
 echo fmt"{toCopy.repr =}"
 
 ==="testRef"
 
 let toRef = Fighter.new()
 echo fmt"{toRef.repr =}"
-toRef.testRef
+toRef.testRef()
 echo fmt"{toRef.repr =}"
 
 ==="testPtr"
@@ -68,5 +67,5 @@ let
   a = Fighter()
   toPtr = a.addr
 echo fmt"{toPtr.repr =}"
-toPtr.testPtr
+toPtr.testPtr()
 echo fmt"{toPtr.repr =}"

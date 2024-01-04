@@ -34,7 +34,7 @@ assert parseEnum[FuturesExchange]("xxx", SHFE) == SHFE
 
 import std/[typetraits]
 assert FuturesExchange.enumLen == 3
-assert COlor.enumLen == 3
+assert Color.enumLen == 3
 
 ## Flags
 
