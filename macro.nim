@@ -16,14 +16,14 @@ template expectKinds(range, i, body: untyped) =
 macro testGenAst(range, i, body: untyped): untyped =
   expectKinds(range, i, body)
   result =
-    genAst(range, i, body):
+    genAst(range, i, body) do:
       for i in range:
         body
 
 macro testQuote(range, i, body: untyped): untyped =
   expectKinds(range, i, body)
   result =
-    quote:
+    quote do:
       for `i` in `range`:
         `body`
 
@@ -37,7 +37,7 @@ template testTemplate(range, i, body: untyped) =
 macro testAstConstruct(range, i, body: untyped): untyped =
   result = nnkStmtList.newTree(nnkForStmt.newTree(i, range, body))
 
-var items = 5..8
+var items = 5 .. 8
 
 ==="test gen ast"
 testGenAst items, item:
@@ -72,14 +72,14 @@ proc logExitProc[T](procName: string; st: MonoTime; r: T; e: ref Exception) {.in
   else:
     echo fmt"""{now().utc} ({getThreadId():<6}) | EXIT procName: "{procName}", elap: "{(getMonoTime()-st).inMilliseconds}ms", result: "{r.repr}""""
 
-dumpAstGen:
-  proc test(): int =
-    let st = getMonoTime()
-    logEnterProc("test")
-    try:
-      result = 1
-    finally:
-      logExitProc[int]("test", st, result, getCurrentException())
+# dumpAstGen:
+#   proc test(): int =
+#     let st = getMonoTime()
+#     logEnterProc("test")
+#     try:
+#       result = 1
+#     finally:
+#       logExitProc[int]("test", st, result, getCurrentException())
 
 macro tracing(p: untyped): untyped =
   expectKind(p, nnkProcDef)
@@ -87,44 +87,44 @@ macro tracing(p: untyped): untyped =
     procName = $(p.name) # proc name
     resultTypeNode = p.params[0]
 
-  let
-    newBody =
-      nnkStmtList.newTree(
-        nnkLetSection.newTree(
-          nnkIdentDefs.newTree(
-            newIdentNode("_st"),
-            newEmptyNode(),
-            nnkCall.newTree(newIdentNode("getMonoTime")),
-          )
+  let newBody =
+    nnkStmtList.newTree(
+      nnkLetSection.newTree(
+        nnkIdentDefs.newTree(
+          newIdentNode("_st"),
+          newEmptyNode(),
+          nnkCall.newTree(newIdentNode("getMonoTime")),
         ),
-        nnkCall.newTree(newIdentNode("logEnterProc"), newLit(procName)),
-        nnkTryStmt.newTree(
-          p.body, # proc old body
-          nnkFinally.newTree(
-            nnkStmtList.newTree(
-              if resultTypeNode.kind == nnkEmpty:
-                # the result type of the proc is not exist
-                # logExitProc(procName,st,error)
-                nnkCall.newTree(
-                  newIdentNode("logExitProc"),
-                  newLit(procName),
-                  newIdentNode("_st"),
-                  nnkCall.newTree(newIdentNode("getCurrentException")),
-                )
-              else:
-                # the result type of the proc is T
-                # logExitProc[T](procName,st,result,error)
-                nnkCall.newTree(
-                  nnkBracketExpr.newTree(newIdentNode("logExitProc"), resultTypeNode),
-                  newLit(procName),
-                  newIdentNode("_st"),
-                  newIdentNode("result"),
-                  nnkCall.newTree(newIdentNode("getCurrentException")),
-                )
-            )
+      ),
+      nnkCall.newTree(newIdentNode("logEnterProc"), newLit(procName)),
+      nnkTryStmt.newTree(
+        p.body, # proc old body
+        nnkFinally.newTree(
+          nnkStmtList.newTree(
+            if resultTypeNode.kind == nnkEmpty:
+              # the result type of the proc is not exist
+              # logExitProc(procName,st,error)
+              nnkCall.newTree(
+                newIdentNode("logExitProc"),
+                newLit(procName),
+                newIdentNode("_st"),
+                nnkCall.newTree(newIdentNode("getCurrentException")),
+              )
+            else:
+              # the result type of the proc is T
+              # logExitProc[T](procName,st,result,error)
+              nnkCall.newTree(
+                nnkBracketExpr.newTree(newIdentNode("logExitProc"), resultTypeNode),
+                newLit(procName),
+                newIdentNode("_st"),
+                newIdentNode("result"),
+                nnkCall.newTree(newIdentNode("getCurrentException")),
+              )
+            ,
           ),
         ),
-      )
+      ),
+    )
   p.body = newBody
   result = p
 
@@ -147,3 +147,50 @@ try:
   discard testRaiseError(44, 44)
 except:
   discard
+
+==="字段与杂注"
+import std/macros
+
+template opt() {.pragma.}
+template opt2() {.pragma.}
+
+type A = object
+  name {.opt, opt2.}: string
+  age: int
+
+var a = A(name: "foo", age: 10)
+
+# expect like below:
+#
+# case k
+# of "name":
+#   a.name = v
+# else:
+#   discard
+# 
+macro parse(a: typed; k, v: untyped): untyped =
+  # case k
+  result = nnkCaseStmt.newTree(k)
+  # of branches
+  let typeImpl = a.getTypeInst().getImpl()
+  # echo typeImpl.treeRepr() # 打印 type desc ast
+  for fieldDef in typeImpl[2][2]:
+    if fieldDef[0].kind == nnkPragmaExpr:
+      for pragma in fieldDef[0][1]:
+        if pragma.eqIdent("opt"):
+          let fieldNameIdent = fieldDef[0][0]
+          result.add nnkOfBranch.newTree(
+              newLit(fieldNameIdent.strVal()),
+              nnkStmtList.newTree(
+                nnkAsgn.newTree(nnkDotExpr.newTree(a, fieldNameIdent), v)
+              ),
+            )
+  # else: discard
+  result.add nnkElse.newTree(
+      nnkStmtList.newTree(nnkDiscardStmt.newTree(newEmptyNode()))
+    )
+
+let k = "name"
+let v = "🤔"
+parse a, k, v
+echo a
