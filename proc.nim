@@ -1,71 +1,96 @@
 import std/[strformat]
 
-#[
-参数传递类型：
-* 值传递
-* 引用传递
-]#
-
 proc `===`(title: string) =
   echo fmt"--{title:-<30}"
 
-type Fighter = object
-  name: string = "Ken"
-  skill: seq[string]
+template echoAddr(v: untyped; tag: static[string]) =
+  block:
+    let t {.inject.} = tag
+    let vv {.inject.} = cast[int](v)
+    echo fmt"{t:<30}: {vv}"
 
-proc testImmut(v: Fighter) =
-  # v.skill.add "hadouken" # 不允许修改
-  echo fmt"testImmut: {v.repr =}"
+proc testImmutCopy[T](a: T) =
+  echoAddr a.addr, "immut copy var"
+  when a is ref:
+    echoAddr a, "immut copy var ->"
+  when a is array:
+    echoAddr a[0].addr, "immut copy var elements"
+  when a is seq:
+    echoAddr a[0].addr, "immut copy var elements"
+  when a is string:
+    echoAddr a[0].addr, "immut copy var elements"
 
-proc testMut(v: var Fighter) =
-  v.skill.add "hadouken"
-  echo fmt"testMut: {v.repr =}"
+proc testMutBorrow[T](a: var T) =
+  echoAddr a.addr, "mut borrow var"
+  when a is ref:
+    echoAddr a, "mut borrow var ->"
+  when a is array:
+    echoAddr a[0].addr, "mut borrow var elements"
+  when a is seq:
+    echoAddr a[0].addr, "mut borrow var elements"
+  when a is string:
+    echoAddr a[0].addr, "mut borrow var elements"
 
-proc testCopy(v: sink Fighter) =
-  v.skill.add "hadouken"
-  echo fmt"testCopy: {v.repr =}"
+proc testPtr[T](a: ptr T) =
+  echoAddr a.addr, "ptr var"
+  echoAddr a, "ptr var ->"
+  when a[] is ref:
+    echoAddr a[], "ptr var -> ->"
+  when a[] is array:
+    echoAddr a[][0].addr, "ptr var -> elements"
+  when a[] is seq:
+    echoAddr a[][0].addr, "ptr var -> elements"
+  when a[] is string:
+    echoAddr a[][0].addr, "ptr var -> elements"
 
-proc testRef(v: ref Fighter) =
-  v.skill.add "hadouken"
-  echo fmt"testRef: {v.repr =}"
+proc testMoveOrCopy[T](a: sink T) =
+  echoAddr a.addr, "move or copy var"
+  when a is ref:
+    echoAddr a, "move or copy var ->"
+  when a is array:
+    echoAddr a[0].addr, "move or copy var elements"
+  when a is seq:
+    echoAddr a[0].addr, "move or copy var elements"
+  when a is string:
+    echoAddr a[0].addr, "move or copy var elements"
 
-proc testPtr(v: ptr Fighter) =
-  v[].skill.add "hadouken"
-  echo fmt"testPtr: {v.repr =}"
+template echoAddrs(a, T: untyped) =
+  echoAddr a.addr, "origin var"
+  when a is ref:
+    echoAddr a, "origin var ->"
+  when a is array:
+    echoAddr a[0].addr, "origin var elements"
+  when a is seq:
+    echoAddr a[0].addr, "origin var elements"
+  when a is string:
+    echoAddr a[0].addr, "origin var elements"
+  testImmutCopy[T](a)
+  testMutBorrow[T](a)
+  testMoveOrCopy[T](a)
+  testPtr[T](addr(a))
 
-==="testImmut"
+==="value object"
+type P = object
+  name: string
+  age: int
 
-let toImmut = Fighter()
-echo fmt"{toImmut.repr =}"
-toImmut.testImmut()
-echo fmt"{toImmut.repr =}"
+var a = P(name: "foo", age: 10)
+echoAddrs a, P
 
-==="testMut"
+==="ref object"
+type Pr = ref P
+var b = Pr(name: "foo", age: 10)
+echoAddrs b, Pr
 
-var toMut = Fighter()
-echo fmt"{toMut.repr =}"
-toMut.testMut()
-echo fmt"{toMut.repr =}"
+==="seq"
+var c = @["foo", "bar"]
+echoAddrs c, seq[string]
 
-==="testCopy"
+==="array"
+var d = ["foo", "bar"]
+echoAddrs d, array[2, string]
 
-let toCopy = Fighter()
-echo fmt"{toCopy.repr =}"
-toCopy.testCopy()
-echo fmt"{toCopy.repr =}"
-
-==="testRef"
-
-let toRef = Fighter.new()
-echo fmt"{toRef.repr =}"
-toRef.testRef()
-echo fmt"{toRef.repr =}"
-
-==="testPtr"
-
-let
-  a = Fighter()
-  toPtr = a.addr
-echo fmt"{toPtr.repr =}"
-toPtr.testPtr()
-echo fmt"{toPtr.repr =}"
+==="string"
+var e = "foo"
+e.add "bar"
+echoAddrs e, string
