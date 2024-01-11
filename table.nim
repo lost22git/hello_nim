@@ -1,15 +1,19 @@
-## Table (HashMap)
-## 
-## refer: https://github.com/nim-lang/Nim/blob/devel/lib/pure/collections/hashcommon.nim
-## 
-## hash 冲突: open-address
-##
-## 容量扩张:
-##    when: len / cap > 2/3 (0.67)
-##    factor: 2
-## 
-## 如果不指定 cap, 默认初始化 cap: 64
-## 如果指定 cap n, 则 cap: nextPowerOfTwo(n * 3 div 2 + 4)
+#[ 
+
+Table (HashMap)
+
+refer: https://github.com/nim-lang/Nim/blob/devel/lib/pure/collections/hashcommon.nim
+
+hash 冲突: open-address
+
+容量扩张:
+   when: len / cap > 2/3 (0.67)
+   factor: 2
+
+如果不指定 cap, 默认初始化 cap: 64
+如果指定 cap n, 则 cap: nextPowerOfTwo(n * 3 div 2 + 4)
+
+]#
 
 ## ------ 验证程序 -------------------------
 
