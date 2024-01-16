@@ -1,7 +1,7 @@
 import std/[unicode, strutils, strformat]
 
 proc `===`(title: string) =
-  echo fmt"--{title:-<30}"
+  echo fmt"------{title:-<30}"
 
 ==="字符串连接"
 

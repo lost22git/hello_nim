@@ -1,7 +1,7 @@
 import std/[strformat]
 
 proc `===`(title: string) =
-  echo fmt"--{title:-<30}"
+  echo fmt"------{title:-<30}"
 
 template echoAddr(v: untyped, tag: static[string]) =
   block:

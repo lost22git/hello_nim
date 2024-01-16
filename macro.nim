@@ -4,7 +4,7 @@ import std/[macros, genasts]
 template `===`(title: static[string]) =
   block:
     let t {.inject.} = title
-    echo fmt"--{t:-<30}"
+    echo fmt"------{t:-<30}"
 
 ## Ast
 
@@ -16,14 +16,14 @@ template expectKinds(range, i, body: untyped) =
 macro testGenAst(range, i, body: untyped): untyped =
   expectKinds(range, i, body)
   result =
-    genAst(range, i, body) do:
+    genAst(range, i, body):
       for i in range:
         body
 
 macro testQuote(range, i, body: untyped): untyped =
   expectKinds(range, i, body)
   result =
-    quote do:
+    quote:
       for `i` in `range`:
         `body`
 
@@ -37,7 +37,7 @@ template testTemplate(range, i, body: untyped) =
 macro testAstConstruct(range, i, body: untyped): untyped =
   result = nnkStmtList.newTree(nnkForStmt.newTree(i, range, body))
 
-var items = 5 .. 8
+var items = 5..8
 
 ==="test gen ast"
 testGenAst items, item:
@@ -60,13 +60,13 @@ import std/[times, monotimes, os, typedthreads]
 proc logEnterProc(procName: string) {.inline.} =
   echo fmt"""{now().utc} ({getThreadId():<6}) | ENTER procName: "{procName}""""
 
-proc logExitProc(procName: string; st: MonoTime; e: ref Exception) {.inline.} =
+proc logExitProc(procName: string, st: MonoTime, e: ref Exception) {.inline.} =
   if not isNil(e):
     echo fmt"""{now().utc} ({getThreadId():<6}) | EXIT procName: "{procName}", elap: "{(getMonoTime()-st).inMilliseconds}ms", error: "{e.msg}""""
   else:
     echo fmt"""{now().utc} ({getThreadId():<6}) | EXIT procName: "{procName}", elap: "{(getMonoTime()-st).inMilliseconds}ms""""
 
-proc logExitProc[T](procName: string; st: MonoTime; r: T; e: ref Exception) {.inline.} =
+proc logExitProc[T](procName: string, st: MonoTime, r: T, e: ref Exception) {.inline.} =
   if not isNil(e):
     echo fmt"""{now().utc} ({getThreadId():<6}) | EXIT procName: "{procName}", elap: "{(getMonoTime()-st).inMilliseconds}ms", error: "{e.msg}""""
   else:
@@ -87,44 +87,44 @@ macro tracing(p: untyped): untyped =
     procName = $(p.name) # proc name
     resultTypeNode = p.params[0]
 
-  let newBody =
-    nnkStmtList.newTree(
-      nnkLetSection.newTree(
-        nnkIdentDefs.newTree(
-          newIdentNode("_st"),
-          newEmptyNode(),
-          nnkCall.newTree(newIdentNode("getMonoTime")),
+  let
+    newBody =
+      nnkStmtList.newTree(
+        nnkLetSection.newTree(
+          nnkIdentDefs.newTree(
+            newIdentNode("_st"),
+            newEmptyNode(),
+            nnkCall.newTree(newIdentNode("getMonoTime")),
+          )
         ),
-      ),
-      nnkCall.newTree(newIdentNode("logEnterProc"), newLit(procName)),
-      nnkTryStmt.newTree(
-        p.body, # proc old body
-        nnkFinally.newTree(
-          nnkStmtList.newTree(
-            if resultTypeNode.kind == nnkEmpty:
-              # the result type of the proc is not exist
-              # logExitProc(procName,st,error)
-              nnkCall.newTree(
-                newIdentNode("logExitProc"),
-                newLit(procName),
-                newIdentNode("_st"),
-                nnkCall.newTree(newIdentNode("getCurrentException")),
-              )
-            else:
-              # the result type of the proc is T
-              # logExitProc[T](procName,st,result,error)
-              nnkCall.newTree(
-                nnkBracketExpr.newTree(newIdentNode("logExitProc"), resultTypeNode),
-                newLit(procName),
-                newIdentNode("_st"),
-                newIdentNode("result"),
-                nnkCall.newTree(newIdentNode("getCurrentException")),
-              )
-            ,
+        nnkCall.newTree(newIdentNode("logEnterProc"), newLit(procName)),
+        nnkTryStmt.newTree(
+          p.body, # proc old body
+          nnkFinally.newTree(
+            nnkStmtList.newTree(
+              if resultTypeNode.kind == nnkEmpty:
+                # the result type of the proc is not exist
+                # logExitProc(procName,st,error)
+                nnkCall.newTree(
+                  newIdentNode("logExitProc"),
+                  newLit(procName),
+                  newIdentNode("_st"),
+                  nnkCall.newTree(newIdentNode("getCurrentException")),
+                )
+              else:
+                # the result type of the proc is T
+                # logExitProc[T](procName,st,result,error)
+                nnkCall.newTree(
+                  nnkBracketExpr.newTree(newIdentNode("logExitProc"), resultTypeNode),
+                  newLit(procName),
+                  newIdentNode("_st"),
+                  newIdentNode("result"),
+                  nnkCall.newTree(newIdentNode("getCurrentException")),
+                )
+            )
           ),
         ),
-      ),
-    )
+      )
   p.body = newBody
   result = p
 
@@ -154,9 +154,10 @@ import std/macros
 template opt() {.pragma.}
 template opt2() {.pragma.}
 
-type A = object
-  name {.opt, opt2.}: string
-  age: int
+type
+  A = object
+    name {.opt, opt2.}: string
+    age: int
 
 var a = A(name: "foo", age: 10)
 
@@ -168,7 +169,7 @@ var a = A(name: "foo", age: 10)
 # else:
 #   discard
 # 
-macro parse(a: typed; k, v: untyped): untyped =
+macro parse(a: typed, k, v: untyped): untyped =
   # case k
   result = nnkCaseStmt.newTree(k)
   # of branches
@@ -180,15 +181,15 @@ macro parse(a: typed; k, v: untyped): untyped =
         if pragma.eqIdent("opt"):
           let fieldNameIdent = fieldDef[0][0]
           result.add nnkOfBranch.newTree(
-              newLit(fieldNameIdent.strVal()),
-              nnkStmtList.newTree(
-                nnkAsgn.newTree(nnkDotExpr.newTree(a, fieldNameIdent), v)
-              ),
-            )
+            newLit(fieldNameIdent.strVal()),
+            nnkStmtList.newTree(
+              nnkAsgn.newTree(nnkDotExpr.newTree(a, fieldNameIdent), v)
+            ),
+          )
   # else: discard
   result.add nnkElse.newTree(
-      nnkStmtList.newTree(nnkDiscardStmt.newTree(newEmptyNode()))
-    )
+    nnkStmtList.newTree(nnkDiscardStmt.newTree(newEmptyNode()))
+  )
 
 let k = "name"
 let v = "🤔"
