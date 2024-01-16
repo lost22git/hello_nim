@@ -3,33 +3,33 @@ import std/[strformat]
 proc `===`(title: string) =
   echo fmt"--{title:-<30}"
 
-template echoAddr(v: untyped; tag: static[string]) =
+template echoAddr(v: untyped, tag: static[string]) =
   block:
     let t {.inject.} = tag
     let vv {.inject.} = cast[int](v)
     echo fmt"{t:<30}: {vv}"
 
-proc testImmutCopy[T](a: T) =
-  echoAddr a.addr, "immut copy var"
+proc testBorrowOrCopy[T](a: T) =
+  echoAddr a.addr, "borrow or copy var"
   when a is ref:
-    echoAddr a, "immut copy var ->"
+    echoAddr a, "borrow or copy var ->"
   when a is array:
-    echoAddr a[0].addr, "immut copy var elements"
+    echoAddr a[0].addr, "borrow or copy var elements"
   when a is seq:
-    echoAddr a[0].addr, "immut copy var elements"
+    echoAddr a[0].addr, "borrow or copy var elements"
   when a is string:
-    echoAddr a[0].addr, "immut copy var elements"
+    echoAddr a[0].addr, "borrow or copy var elements"
 
-proc testMutBorrow[T](a: var T) =
-  echoAddr a.addr, "mut borrow var"
+proc testBorrowMut[T](a: var T) =
+  echoAddr a.addr, "borrow mut var"
   when a is ref:
-    echoAddr a, "mut borrow var ->"
+    echoAddr a, "borrow mut var ->"
   when a is array:
-    echoAddr a[0].addr, "mut borrow var elements"
+    echoAddr a[0].addr, "borrow mut var elements"
   when a is seq:
-    echoAddr a[0].addr, "mut borrow var elements"
+    echoAddr a[0].addr, "borrow mut var elements"
   when a is string:
-    echoAddr a[0].addr, "mut borrow var elements"
+    echoAddr a[0].addr, "borrow mut var elements"
 
 proc testPtr[T](a: ptr T) =
   echoAddr a.addr, "ptr var"
@@ -64,15 +64,16 @@ template echoAddrs(a, T: untyped) =
     echoAddr a[0].addr, "origin var elements"
   when a is string:
     echoAddr a[0].addr, "origin var elements"
-  testImmutCopy[T](a)
-  testMutBorrow[T](a)
+  testBorrowOrCopy[T](a)
+  testBorrowMut[T](a)
   testMoveOrCopy[T](a)
   testPtr[T](addr(a))
 
 ==="value object"
-type P = object
-  name: string
-  age: int
+type
+  P = object
+    name: string
+    age: int
 
 var a = P(name: "foo", age: 10)
 echoAddrs a, P
