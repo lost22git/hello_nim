@@ -1,0 +1,6 @@
+target/
+bin/
+debug/
+
+*.exe
+*.pdb
