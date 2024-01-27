@@ -55,7 +55,7 @@ testTemplate items, item:
 testAstConstruct items, item:
   echo fmt"{item = }"
 
-==="宏与杂注"
+==="宏与编译提示"
 import std/[times, monotimes, os, typedthreads]
 proc logEnterProc(procName: string) {.inline.} =
   echo fmt"""{now().utc} ({getThreadId():<6}) | ENTER procName: "{procName}""""
@@ -148,7 +148,7 @@ try:
 except:
   discard
 
-==="字段与杂注"
+==="字段与编译提示"
 import std/macros
 
 template opt() {.pragma.}
@@ -195,3 +195,59 @@ let k = "name"
 let v = "🤔"
 parse a, k, v
 echo a
+
+==="parseExpr"
+import std/[sequtils, strutils]
+
+macro filter(expr: static string, p: untyped): untyped =
+  expectKind(p, nnkProcDef)
+  let returnType = p.params[0]
+  expectIdent(returnType, "bool")
+  let firstParamDef = p.params[1]
+  expectKind(firstParamDef, nnkIdentDefs)
+  expectKind(firstParamDef[1], nnkBracketExpr)
+  expectIdent(firstParamDef[1][0], "seq")
+  expectIdent(firstParamDef[1][1], "string")
+  let firstParamName = firstParamDef[0]
+
+  let filterExpr = parseExpr(expr)
+
+  let
+    newBody =
+      nnkStmtList.newTree(
+        nnkAsgn.newTree(
+          newIdentNode("result"),
+          nnkCall.newTree(
+            nnkDotExpr.newTree(firstParamName, newIdentNode("anyIt")), filterExpr
+          ),
+        )
+      )
+  p.body = newBody
+  result = p
+
+proc findAny(v: seq[string]): bool {.filter: """it == "foo" or it.startswith("f")""".}
+
+doAssert not @["hello", "kooo"].findAny()
+doAssert @["hello", "fooo"].findAny()
+doAssert @["hello", "foo"].findAny()
+
+==="指定函数名调用相应函数"
+proc print(x: string) =
+  echo x
+
+template haha(fn: static string) {.pragma.}
+
+type
+  Foo = object
+    bar {.haha: "print".}: string
+
+macro callFn(f: static string, vv: untyped): untyped =
+  nnkStmtList.newTree(nnkCommand.newTree(newIdentNode(f), vv))
+
+proc vv(foo: Foo) =
+  for fk, fv in foo.fieldPairs():
+    when fv.hasCustomPragma(haha):
+      const ff = fv.getCustomPragmaVal(haha).fn
+      callFn(ff, fv)
+
+Foo(bar: "bar").vv()
