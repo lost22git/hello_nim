@@ -1,4 +1,11 @@
 #[
+///usr/bin/env nim r "$0" "$@" ; exit $?
+]#
+
+import std/[sugar]
+import std/[strutils]
+
+#[
 
 nil
 
@@ -10,9 +17,6 @@ nil handling
 2) ?
 
 ]#
-
-import std/[sugar]
-import std/[strutils]
 
 ## ------ Option -----------------------
 

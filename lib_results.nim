@@ -1,3 +1,7 @@
+#[
+///usr/bin/env nim r "$0" "$@" ; exit $?
+]#
+
 import results
 import std/strformat
 import std/sugar

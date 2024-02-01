@@ -1,3 +1,7 @@
+#[
+///usr/bin/env nim r "$0" "$@" ; exit $?
+]#
+
 # @[] 创建seq
 doAssert @[1, 2, 3].len == 3
 doAssert @[1, 2, 3].capacity == 3

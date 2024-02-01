@@ -1,14 +1,18 @@
 #[
+///usr/bin/env nim r "$0" "$@" ; exit $?
+]#
+
+import pretty
+
+import std/[json, jsonutils, sequtils]
+
+#[
   
   [pretty](https://github.com/treeform/pretty)
 
   `nimble install pretty`
 
 ]#
-
-import pretty
-
-import std/[json, jsonutils, sequtils]
 
 type
   Book = object

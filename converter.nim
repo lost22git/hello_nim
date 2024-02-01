@@ -1,10 +1,16 @@
-type User = object
-  firstName: string
-  lastName: string
+#[
+///usr/bin/env nim r "$0" "$@" ; exit $?
+]#
 
-type UserView = object
-  firstName: string
-  lastName: string
+type
+  User = object
+    firstName: string
+    lastName: string
+
+type
+  UserView = object
+    firstName: string
+    lastName: string
 
 converter toUserView(user: User): UserView =
   result.firstName = user.firstName
