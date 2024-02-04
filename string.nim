@@ -7,7 +7,7 @@ import std/[unicode, strutils, strformat]
 proc `===`(title: string) =
   echo fmt"------{title:-<30}"
 
-==="字符串连接"
+==="字符串拼接"
 
 echo "你好" & "，" & "世界"
 
@@ -69,6 +69,36 @@ echo fmt"{substrOrigin = }"
 echo fmt"{substr = }"
 assert substrOrigin != substr
 
+==="字符串是否为空串"
+
+echo fmt"""{"\t\v \r\n".isEmptyOrWhiteSpace() = }"""
+
+==="字符串strip"
+
+echo fmt"""
+{strutils.strip(" 你好，世界 ") = }
+"""
+
+echo fmt"""
+{unicode.strip(" 你好，世界 ") = }
+"""
+
+==="字符串split"
+
+echo fmt"""
+{"你好，世界".split("，") = }
+"""
+
+echo fmt"""
+{"你好，世界".split("，", maxsplit = 1) = }
+"""
+
+==="字符串replace"
+
+echo fmt"""
+{"你好，世界；你好，nim".replace("你好", "halo")}
+"""
+
 ==="字符串解析"
 
 import std/[nre]
@@ -77,7 +107,7 @@ var
   csv =
     """
 nim,gc,native code
-rust,no gc,native code
+rust,non_gc,native code
 java,gc,bytecode
 """
 
@@ -100,7 +130,7 @@ when not defined(windows):
 else:
   ==="strscans"
   import std/[strscans]
-  var language, mm, compilationProduct: string
+  var lang, mm, cg: string
   for line in csv.splitLines:
-    if line.scanf("$w,$w,$w", language, mm, compilationProduct):
-      echo fmt"{language = }, {mm = }, {compilationProduct = }"
+    if line.scanf("$w,$w,$w", lang, mm, cg):
+      echo fmt"{lang = }, {mm = }, {cg = }"
