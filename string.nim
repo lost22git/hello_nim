@@ -101,8 +101,6 @@ echo fmt"""
 
 ==="字符串解析"
 
-import std/[nre]
-
 var
   csv =
     """
@@ -113,6 +111,7 @@ java,gc,bytecode
 
 when not defined(windows):
   ==="正则表达式 pcre"
+  import std/[nre]
   let
     pattern = re"(.+),(.+),(.+)\r?\n"
     captureCount = pattern.captureCount
