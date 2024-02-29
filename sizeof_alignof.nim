@@ -57,30 +57,27 @@ doAssert sizeof(Table[string, string]) == 24
 doAssert alignof(Table[string, string]) == 8
 
 # enum
-type
-  Lang = enum
-    langNim
-    langJava
-    langRust
+type Lang = enum
+  langNim
+  langJava
+  langRust
 
 doAssert sizeof(Lang) == 1
 doAssert alignof(Lang) == 1
 
 # object
-type
-  Account = object
-    id: uint32
-    name: string
-    balance: uint32
+type Account = object
+  id: uint32
+  name: string
+  balance: uint32
 
 doAssert sizeof(Account) == (4 + 4) + 16 + (4 + 4)
 doAssert alignof(Account) == 8
 
-type
-  Account2 = object
-    id: uint32
-    balance: uint32
-    name: string
+type Account2 = object
+  id: uint32
+  balance: uint32
+  name: string
 
 doAssert sizeof(Account2) == 4 + 4 + 16
 doAssert alignof(Account2) == 8
@@ -91,11 +88,10 @@ doAssert sizeof(AccountRef) == 8
 doAssert alignof(AccountRef) == 8
 
 # object packed
-type
-  AccountPacked {.packed.} = object
-    id: uint32
-    name: string
-    balance: uint32
+type AccountPacked {.packed.} = object
+  id: uint32
+  name: string
+  balance: uint32
 
 doAssert sizeof(AccountPacked) == 4 + 16 + 4
 doAssert alignof(AccountPacked) == 1

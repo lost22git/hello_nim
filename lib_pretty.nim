@@ -14,25 +14,21 @@ import std/[json, jsonutils, sequtils]
 
 ]#
 
-type
-  Book = object
-    name: string
-    tags: seq[string]
-    price: float
+type Book = object
+  name: string
+  tags: seq[string]
+  price: float
 
-let
-  books =
-    @[
-      Book(name: "Shi Ji", tags: @["History", "China"], price: 66'd),
-      Book(
-        name: "The Mathematical Principles of Natural Philosophy",
-        tags: @["Math", "Physical"],
-        price: 77'd,
-      ),
-      Book(
-        name: "Compilers: Principles", tags: @["Computer", "Programming"], price: 88'd
-      )
-    ]
+let books =
+  @[
+    Book(name: "Shi Ji", tags: @["History", "China"], price: 66'd),
+    Book(
+      name: "The Mathematical Principles of Natural Philosophy",
+      tags: @["Math", "Physical"],
+      price: 77'd,
+    ),
+    Book(name: "Compilers: Principles", tags: @["Computer", "Programming"], price: 88'd),
+  ]
 
 print toJson(books)
 

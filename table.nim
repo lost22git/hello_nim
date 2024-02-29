@@ -37,12 +37,12 @@ template printTableMeta(t) =
 
 var t = initTable[string, int](1)
 printTableMeta t
-for i in 1..5:
+for i in 1 .. 5:
   t[fmt"{i}"] = i
 printTableMeta t
 t["6"] = 6
 printTableMeta t
-for i in 7..11:
+for i in 7 .. 11:
   t[fmt"{i}"] = i
 printTableMeta t
 t["12"] = 12

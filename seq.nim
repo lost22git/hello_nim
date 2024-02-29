@@ -26,6 +26,6 @@ for e in newSeqWith(10, 1):
 # resize
 import std/strformat
 var a: seq[int] = @[]
-for i in 1..10:
+for i in 1 .. 10:
   echo fmt"cap: {a.capacity}, len: {a.len}"
   a.add 1

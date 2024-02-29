@@ -13,35 +13,31 @@ object 类型：
 
 # 值类型 final type (不可被继承)
 
-type
-  Name = object
-    firstName: string
-    lastName: string
+type Name = object
+  firstName: string
+  lastName: string
 
 # 值类型 可被继承
 
-type
-  Person = object of RootObj
-    name: Name
-    age: Natural
+type Person = object of RootObj
+  name: Name
+  age: Natural
 
 # distinct type
 type UID {.borrow: `.`.} = distinct uint64
 
-type
-  LoginMethod = enum
-    password
-    pki
+type LoginMethod = enum
+  password
+  pki
 
 # object variants
-type
-  User = object of Person
-    id: UID
-    case loginMethod: LoginMethod
-    of password:
-      password: string
-    of pki:
-      publicKey: string
+type User = object of Person
+  id: UID
+  case loginMethod: LoginMethod
+  of password:
+    password: string
+  of pki:
+    publicKey: string
 
 # 引用类型 ref type (内存安全，gc)
 type UserRef = ref User

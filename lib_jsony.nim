@@ -23,21 +23,18 @@ proc parseHook*(s: string, i: var int, v: var DateTime) =
   parseHook(s, i, str)
   v = parse(str, "yyyy-MM-dd'T'HH:mm:sszzz", utc())
 
-type
-  Book = object
-    name: string
-    tags: seq[string]
-    price: float
-    publishTime: DateTime
+type Book = object
+  name: string
+  tags: seq[string]
+  price: float
+  publishTime: DateTime
 
-let
-  book =
-    Book(
-      name: "Compilers: Principles, Techniques, and Tools",
-      tags: @["Programming", "Computer"],
-      price: 27.22'd,
-      publishTime: datetime(2007, mJul, 7, zone = utc()),
-    )
+let book = Book(
+  name: "Compilers: Principles, Techniques, and Tools",
+  tags: @["Programming", "Computer"],
+  price: 27.22'd,
+  publishTime: datetime(2007, mJul, 7, zone = utc()),
+)
 
 echo "json: ", book.toJson()
 

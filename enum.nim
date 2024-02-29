@@ -14,17 +14,15 @@ template printEnumMembers(E: typedesc[enum]) =
       let i {.inject.} = i
       echo fmt"{i.symbolRank}: {i.symbolName} -> ord: {i.ord}, $: {i}"
 
-type
-  FuturesExchange = enum
-    SHFE = (10, "上海期货交易所")
-    DCE = ("大连期货交易所")
-    CFFEX = ("中金所")
+type FuturesExchange = enum
+  SHFE = (10, "上海期货交易所")
+  DCE = ("大连期货交易所")
+  CFFEX = ("中金所")
 
-type
-  Color = enum
-    red
-    green
-    blue
+type Color = enum
+  red
+  green
+  blue
 
 printEnumMembers FuturesExchange
 printEnumMembers Color

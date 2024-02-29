@@ -55,10 +55,9 @@ doAssert some("foo").map(v => some(v.len())).flatten() == some(3)
 ## ------ ? ----------------------------
 import std/[wrapnils]
 
-type
-  P = ref object
-    name: ref string
-    age: int
+type P = ref object
+  name: ref string
+  age: int
 
 let p: P = nil
 doAssert ?.p.name == nil

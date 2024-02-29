@@ -74,10 +74,9 @@ template echoAddrs(a, T: untyped) =
   testPtr[T](addr(a))
 
 ==="value object"
-type
-  P = object
-    name: string
-    age: int
+type P = object
+  name: string
+  age: int
 
 var a = P(name: "foo", age: 10)
 echoAddrs a, P

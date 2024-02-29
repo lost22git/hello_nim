@@ -5,11 +5,10 @@
 import std/with
 import std/times
 
-type
-  User = object
-    name: string
-    birthday: DateTime
-    age: Natural
+type User = object
+  name: string
+  birthday: DateTime
+  age: Natural
 
 var u: User
 
