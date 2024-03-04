@@ -3,6 +3,7 @@
 ]#
 
 doAssert 3 / 2 == 1.5
+# div truncate
 doAssert 3 div 2 == 1
 doAssert -3 div -2 == 1
 doAssert -3 div 2 == -1
@@ -24,6 +25,7 @@ doAssert -128'i8 -% 1'i8 == 127
 doAssertRaises(OverflowDefect):
   discard -128'i8 - 1'i8
 
+# unsigned comparation
 # 对操作数进行 unsigned 处理，然后进行比较
 #
 # | x `<%` y  | unsigned(x) < unsigned(y)  |
