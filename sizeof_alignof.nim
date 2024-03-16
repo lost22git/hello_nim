@@ -53,6 +53,9 @@ doAssert sizeof(array[4, int]) == 4 * 8
 doAssert alignof(array[4, int]) == 8
 
 # tuple
+doAssert sizeof((int, int, int)) == 3 * 8
+doAssert alignof((int, int, int)) == 8
+
 doAssert sizeof(tuple[x: int, y: int, z: int]) == 3 * 8
 doAssert alignof(tuple[x: int, y: int, z: int]) == 8
 doAssert offsetof(tuple[x: int, y: int, z: int], x) == 0

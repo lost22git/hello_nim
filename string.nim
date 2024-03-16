@@ -96,7 +96,7 @@ echo fmt"""
 ==="字符串replace"
 
 echo fmt"""
-{"你好，世界；你好，nim".replace("你好", "halo")}
+{"你好，世界；你好，nim".replace("你好", "halo") = }
 """
 
 ==="字符串解析"

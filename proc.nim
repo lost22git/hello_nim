@@ -13,6 +13,10 @@ template echoAddr(v: untyped, tag: static[string]) =
     let vv {.inject.} = cast[int](v)
     echo fmt"{t:<30}: {vv}"
 
+# - array always => borrow
+# - object or tuple:
+#   - sizeOf(T) > 24 bytes => borrow
+#   - sizeOf(T) <= 24 bytes => copy
 proc testBorrowOrCopy[T](a: T) =
   echoAddr a.addr, "borrow or copy var"
   when a is ref:
@@ -74,9 +78,10 @@ template echoAddrs(a, T: untyped) =
   testPtr[T](addr(a))
 
 ==="value object"
-type P = object
-  name: string
-  age: int
+type
+  P = object
+    name: string
+    age: int
 
 var a = P(name: "foo", age: 10)
 echoAddrs a, P
@@ -91,8 +96,8 @@ var c = @["foo", "bar"]
 echoAddrs c, seq[string]
 
 ==="array"
-var d = ["foo", "bar"]
-echoAddrs d, array[2, string]
+var d = ["foo"]
+echoAddrs d, array[1, string]
 
 ==="string"
 var e = "foo"
