@@ -6,14 +6,14 @@ import std/logging
 
 # | Variable | Output |
 # |----------|--------|
-# |$date	   | Current date |
-# |$time	   | Current time |
+# |$date     | Current date |
+# |$time     | Current time |
 # |$datetime | $dateT$time  |
-# |$app	     | os.getAppFilename() |
-# |$appname	 | Base name of $app |
-# |$appdir	 | Directory name of $app |
-# |$levelid	 | First letter of log level |
-# |$levelname|	Log level name |
+# |$app      | os.getAppFilename() |
+# |$appname  | Base name of $app |
+# |$appdir   | Directory name of $app |
+# |$levelid  | First letter of log level |
+# |$levelname| Log level name |
 
 # | level enum |
 # |------------|
