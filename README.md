@@ -4,3 +4,4 @@
 
 - https://nimprogramming.com/tutorials/all
 - https://internet-of-tomohiro.netlify.app/nim/faq.en
+- https://nim-lang.org/araq/
