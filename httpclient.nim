@@ -2,7 +2,7 @@
 ///usr/bin/env nim r -d:ssl "$0" "$@" ; exit $?
 ]#
 
-import std/[httpclient, asyncdispatch, strformat, os, json, logging]
+import std/[httpclient, asyncdispatch, json, logging]
 
 proc doPost(): Future[string] {.async.} =
   const base_uri = "https://httpbin.org"
