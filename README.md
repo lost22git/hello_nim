@@ -14,4 +14,4 @@
 |fitler/toSeq|std/sugar.collect()|std/sequtils|
 |get cmd result|system.gorge()/gorgeEx()|std/osproc|
 |time|get from shell|std/time|
-
+|cmdline param|system/nimscript.paramCount/paramStr()|std/cmdline.paramCount/paramStr()|
