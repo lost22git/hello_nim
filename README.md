@@ -16,4 +16,7 @@
 | get cmd result | system.gorge()/gorgeEx() |std/osproc |
 | time | get from shell | std/time |
 
+> NOTE:
+It is **not recommended** to use Nim script for heavy task, because the memory overhead of the VM is large, at least on Windows.
 
+__Consider using Lua ;)__
